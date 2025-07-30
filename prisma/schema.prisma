@@ -1,0 +1,246 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "darwin", "darwin-arm64"]
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+enum VoteType {
+  UP
+  DOWN
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum UserType {
+  FREE
+  PAID
+  MENTOR
+}
+
+model User {
+  id                String         @id @default(cuid())
+  name              String?
+  email             String?        @unique
+  emailVerified     DateTime?
+  createdSubreddits Subreddit[]    @relation("CreatedBy")
+  subscriptions     Subscription[]
+  votes             Vote[]
+
+  username String? @unique
+
+  image       String?
+  accounts    Account[]
+  sessions    Session[]
+  Post        Post[]
+  Comment     Comment[]
+  CommentVote CommentVote[]
+  SentMessages Message[] @relation("SentMessages")
+  ReceivedMessages Message[] @relation("ReceivedMessages")
+  InitiatedThreads DmThread[] @relation("InitiatedThreads")
+  UserAThreads   DmThread[] @relation("UserAThreads")
+  UserBThreads   DmThread[] @relation("UserBThreads")
+  MentorApplications MentorApplication[]
+  MentorProfile MentorProfile?
+
+  userType UserType @default(FREE)
+  role     UserRole @default(USER)
+  mentorApplicationsLeft Int @default(2) // Track remaining application attempts
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  MODERATOR
+}
+
+model Subreddit {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  posts     Post[]
+
+  creatorId   String?
+  Creator     User?          @relation("CreatedBy", fields: [creatorId], references: [id])
+  subscribers Subscription[]
+
+  isPrivate Boolean @default(false)
+
+  @@index([name])
+}
+
+model Subscription {
+  user        User      @relation(fields: [userId], references: [id])
+  userId      String
+  subreddit   Subreddit @relation(fields: [subredditId], references: [id])
+  subredditId String
+
+  @@id([userId, subredditId])
+}
+
+model Post {
+  id          String    @id @default(cuid())
+  title       String
+  content     Json?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  author      User      @relation(fields: [authorId], references: [id])
+  authorId    String
+  subreddit   Subreddit @relation(fields: [subredditId], references: [id])
+  subredditId String
+  comments    Comment[] 
+  votes       Vote[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  text      String
+  createdAt DateTime @default(now())
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+
+  replyToId String?
+  replyTo   Comment?  @relation("ReplyTo", fields: [replyToId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies   Comment[] @relation("ReplyTo")
+
+  votes     CommentVote[]
+  commentId String?
+}
+
+model Vote {
+  user   User     @relation(fields: [userId], references: [id])
+  userId String
+  post   Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId String
+  type   VoteType
+
+  @@id([userId, postId])
+}
+
+model CommentVote {
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  commentId String
+  type      VoteType
+
+  @@id([userId, commentId])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  senderId  String
+  receiverId String
+  content   String
+  createdAt DateTime @default(now())
+  read      Boolean  @default(false)
+
+  sender    User     @relation("SentMessages", fields: [senderId], references: [id])
+  receiver  User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+
+  threadId  String?
+  thread    DmThread? @relation(fields: [threadId], references: [id])
+
+  @@index([senderId])
+  @@index([receiverId])
+}
+
+enum DmThreadStatus {
+  pending
+  accepted
+  rejected
+}
+
+model DmThread {
+  id           String   @id @default(cuid())
+  userAId      String
+  userBId      String
+  initiatorId  String
+  status       DmThreadStatus
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  userA        User     @relation("UserAThreads", fields: [userAId], references: [id])
+  userB        User     @relation("UserBThreads", fields: [userBId], references: [id])
+  initiator    User     @relation("InitiatedThreads", fields: [initiatorId], references: [id])
+  messages     Message[]
+
+  @@index([userAId])
+  @@index([userBId])
+}
+
+model MentorApplication {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  age         Int
+  experience  String   @db.Text
+  motivation  String   @db.Text
+  status      MentorApplicationStatus @default(PENDING)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([status])
+}
+
+enum MentorApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model MentorProfile {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  bio       String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tags      MentorTag[]
+}
+
+model MentorTag {
+  id              String         @id @default(cuid())
+  tag             String
+  mentorProfile   MentorProfile  @relation(fields: [mentorProfileId], references: [id], onDelete: Cascade)
+  mentorProfileId String
+}
