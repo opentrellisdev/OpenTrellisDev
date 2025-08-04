@@ -211,6 +211,8 @@ model MentorApplication {
   age         Int
   experience  String   @db.Text
   motivation  String   @db.Text
+  revenue     String?
+  businessExplanation String? @db.Text
   status      MentorApplicationStatus @default(PENDING)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

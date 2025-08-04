@@ -5,8 +5,10 @@ import { z } from 'zod'
 const MentorApplicationValidator = z.object({
   name: z.string().min(1, 'Name is required'),
   age: z.string().min(1, 'Age is required'),
-  experience: z.string().min(10, 'Experience must be at least 10 characters'),
-  motivation: z.string().min(10, 'Motivation must be at least 10 characters'),
+  experience: z.string().min(10, 'Experience must be at least 10 characters').max(500, 'Experience must be 500 characters or less'),
+  motivation: z.string().min(10, 'Motivation must be at least 10 characters').max(500, 'Motivation must be 500 characters or less'),
+  revenue: z.string().min(1, 'Revenue information is required'),
+  businessExplanation: z.string().min(10, 'Business explanation must be at least 10 characters').max(500, 'Business explanation must be 500 characters or less'),
 })
 
 export async function POST(req: Request) {
@@ -20,7 +22,7 @@ export async function POST(req: Request) {
     const body = await req.json()
     console.log('Received mentor application data:', body)
     
-    const { name, age, experience, motivation } = MentorApplicationValidator.parse(body)
+    const { name, age, experience, motivation, revenue, businessExplanation } = MentorApplicationValidator.parse(body)
 
     // Check if user has remaining attempts
     const user = await db.user.findUnique({
@@ -53,6 +55,8 @@ export async function POST(req: Request) {
           age: parseInt(age),
           experience,
           motivation,
+          revenue,
+          businessExplanation,
         }
       })
       

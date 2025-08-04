@@ -12,6 +12,27 @@ import Link from 'next/link'
 import axios from 'axios'
 import { toast } from '@/hooks/use-toast'
 
+// Helper function to count characters
+const countCharacters = (text: string) => {
+  return text.length
+}
+
+// Helper function to format revenue
+const formatRevenue = (value: string) => {
+  if (!value) return ''
+  
+  // Remove any non-numeric characters except decimal point
+  const numericValue = value.replace(/[^\d.]/g, '')
+  
+  // If it's a valid number, format it
+  if (numericValue && !isNaN(parseFloat(numericValue))) {
+    const number = parseFloat(numericValue)
+    return `$${number.toFixed(2)}`
+  }
+  
+  return value
+}
+
 export default function MentorApplicationPage() {
   const { data: session } = useSession()
   const router = useRouter()
@@ -23,7 +44,9 @@ export default function MentorApplicationPage() {
     name: '',
     age: '',
     experience: '',
-    motivation: ''
+    motivation: '',
+    revenue: '',
+    businessExplanation: ''
   })
 
   useEffect(() => {
@@ -60,7 +83,9 @@ export default function MentorApplicationPage() {
         name: formData.name,
         age: formData.age,
         experience: formData.experience,
-        motivation: formData.motivation
+        motivation: formData.motivation,
+        revenue: formData.revenue,
+        businessExplanation: formData.businessExplanation
       })
 
       toast({
@@ -182,20 +207,20 @@ export default function MentorApplicationPage() {
                 Relevant Experience
                 <span className='text-red-500 ml-1'>*</span>
                 <span className='text-sm text-zinc-500 ml-2'>
-                  ({formData.experience.length}/10+ characters required)
+                  ({countCharacters(formData.experience)}/500 characters)
                 </span>
               </Label>
               <Textarea
                 id='experience'
                 value={formData.experience}
                 onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
-                placeholder='Describe your relevant experience, skills, and expertise... (minimum 10 characters)'
+                placeholder='Describe your relevant experience, skills, and expertise... (500 characters or less)'
                 rows={4}
                 required
-                className={formData.experience.length < 10 && formData.experience.length > 0 ? 'border-red-300' : ''}
+                className={countCharacters(formData.experience) > 500 ? 'border-red-300' : ''}
               />
-              {formData.experience.length < 10 && formData.experience.length > 0 && (
-                <p className='text-red-500 text-sm mt-1'>Please provide at least 10 characters</p>
+              {countCharacters(formData.experience) > 500 && (
+                <p className='text-red-500 text-sm mt-1'>Please keep your response to 500 characters or less</p>
               )}
             </div>
 
@@ -204,27 +229,78 @@ export default function MentorApplicationPage() {
                 Why do you want to be a mentor?
                 <span className='text-red-500 ml-1'>*</span>
                 <span className='text-sm text-zinc-500 ml-2'>
-                  ({formData.motivation.length}/10+ characters required)
+                  ({countCharacters(formData.motivation)}/500 characters)
                 </span>
               </Label>
               <Textarea
                 id='motivation'
                 value={formData.motivation}
                 onChange={(e) => setFormData({ ...formData, motivation: e.target.value })}
-                placeholder='Tell us about your motivation to help others and what you hope to achieve as a mentor... (minimum 10 characters)'
+                placeholder='Tell us about your motivation to help others and what you hope to achieve as a mentor... (500 characters or less)'
                 rows={4}
                 required
-                className={formData.motivation.length < 10 && formData.motivation.length > 0 ? 'border-red-300' : ''}
+                className={countCharacters(formData.motivation) > 500 ? 'border-red-300' : ''}
               />
-              {formData.motivation.length < 10 && formData.motivation.length > 0 && (
-                <p className='text-red-500 text-sm mt-1'>Please provide at least 10 characters</p>
+              {countCharacters(formData.motivation) > 500 && (
+                <p className='text-red-500 text-sm mt-1'>Please keep your response to 500 characters or less</p>
+              )}
+            </div>
+
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+              <div>
+                <Label htmlFor='revenue'>
+                  What was the highest revenue level for which you are responsible?
+                  <span className='text-red-500 ml-1'>*</span>
+                </Label>
+                <Input
+                  id='revenue'
+                  value={formData.revenue}
+                  onChange={(e) => {
+                    // Only allow numbers and decimal points
+                    const value = e.target.value.replace(/[^\d.]/g, '')
+                    setFormData({ ...formData, revenue: value })
+                  }}
+                  onBlur={(e) => setFormData({ ...formData, revenue: formatRevenue(e.target.value) })}
+                  placeholder='Enter amount (e.g., 50000)'
+                  type='text'
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor='businessExplanation'>
+                Briefly explain the business context
+                <span className='text-red-500 ml-1'>*</span>
+                <span className='text-sm text-zinc-500 ml-2'>
+                  ({countCharacters(formData.businessExplanation)}/500 characters)
+                </span>
+              </Label>
+              <Textarea
+                id='businessExplanation'
+                value={formData.businessExplanation}
+                onChange={(e) => setFormData({ ...formData, businessExplanation: e.target.value })}
+                placeholder='Briefly explain the business or industry context for the revenue mentioned above... (500 characters or less)'
+                rows={3}
+                required
+                className={countCharacters(formData.businessExplanation) > 500 ? 'border-red-300' : ''}
+              />
+              {countCharacters(formData.businessExplanation) > 500 && (
+                <p className='text-red-500 text-sm mt-1'>Please keep your response to 500 characters or less</p>
               )}
             </div>
 
             <div className='flex gap-4 pt-4'>
               <Button
                 type='submit'
-                disabled={isSubmitting || formData.experience.length < 10 || formData.motivation.length < 10}
+                disabled={isSubmitting || 
+                  countCharacters(formData.experience) < 10 || 
+                  countCharacters(formData.motivation) < 10 || 
+                  countCharacters(formData.businessExplanation) < 10 ||
+                  countCharacters(formData.experience) > 500 || 
+                  countCharacters(formData.motivation) > 500 ||
+                  countCharacters(formData.businessExplanation) > 500 ||
+                  !formData.revenue.trim()}
                 className='bg-blue-600 hover:bg-blue-700 text-white'
               >
                 {isSubmitting ? 'Submitting...' : 'Submit Application'}

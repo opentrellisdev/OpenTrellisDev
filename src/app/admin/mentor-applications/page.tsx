@@ -14,6 +14,8 @@ interface MentorApplication {
   age: number
   experience: string
   motivation: string
+  revenue: string | null
+  businessExplanation: string | null
   status: 'PENDING' | 'APPROVED' | 'REJECTED'
   createdAt: string
   user: {
@@ -271,6 +273,7 @@ export default function MentorApplicationsPage() {
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Applicant</th>
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Name</th>
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Age</th>
+                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Revenue</th>
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Experience</th>
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Motivation</th>
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Status</th>
@@ -302,6 +305,9 @@ export default function MentorApplicationsPage() {
                     </td>
                     <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
                       {application.age}
+                    </td>
+                    <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
+                      {application.revenue || 'N/A'}
                     </td>
                     <td className='px-6 py-4 whitespace-nowrap'>
                       <div className='text-sm text-gray-900 max-w-xs truncate' title={application.experience}>
@@ -364,7 +370,7 @@ export default function MentorApplicationsPage() {
                 ))}
                 {applications.length === 0 && (
                   <tr>
-                    <td colSpan={7} className='px-6 py-4 text-center text-gray-500'>
+                    <td colSpan={8} className='px-6 py-4 text-center text-gray-500'>
                       No applications found
                     </td>
                   </tr>
@@ -415,6 +421,20 @@ export default function MentorApplicationsPage() {
                 <h4 className='font-medium text-gray-900 mb-2'>Motivation</h4>
                 <div className='bg-gray-50 p-3 rounded-lg'>
                   <p className='whitespace-pre-wrap'>{selectedApplication.motivation}</p>
+                </div>
+              </div>
+
+              <div>
+                <h4 className='font-medium text-gray-900 mb-2'>Revenue Level</h4>
+                <div className='bg-gray-50 p-3 rounded-lg'>
+                  <p className='font-medium'>{selectedApplication.revenue || 'Not provided'}</p>
+                </div>
+              </div>
+
+              <div>
+                <h4 className='font-medium text-gray-900 mb-2'>Business Context</h4>
+                <div className='bg-gray-50 p-3 rounded-lg'>
+                  <p className='whitespace-pre-wrap'>{selectedApplication.businessExplanation || 'Not provided'}</p>
                 </div>
               </div>
 
