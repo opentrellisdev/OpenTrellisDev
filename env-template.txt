@@ -1,0 +1,26 @@
+# Copy this file to .env and fill in your actual values
+
+# Database
+DATABASE_URL="mysql://user:password@localhost:3306/opentrellis"
+
+# NextAuth
+NEXTAUTH_SECRET="your-nextauth-secret-here"
+NEXTAUTH_URL="http://localhost:3000"
+
+# Google OAuth (for authentication)
+GOOGLE_CLIENT_ID="your-google-client-id-here"
+GOOGLE_CLIENT_SECRET="your-google-client-secret-here"
+
+# Stripe Configuration (get these from your Stripe dashboard)
+STRIPE_SECRET_KEY="sk_test_your_stripe_secret_key_here"
+STRIPE_PUBLISHABLE_KEY="pk_test_your_stripe_publishable_key_here"
+STRIPE_WEBHOOK_SECRET="whsec_your_webhook_secret_here"
+STRIPE_MONTHLY_PRICE_ID="price_your_monthly_price_id_here"
+
+# Redis (optional - for caching)
+REDIS_URL="your-redis-url-here"
+REDIS_SECRET="your-redis-secret-here"
+
+# UploadThing (for file uploads)
+UPLOADTHING_SECRET="your-uploadthing-secret-here"
+UPLOADTHING_APP_ID="your-uploadthing-app-id-here" 

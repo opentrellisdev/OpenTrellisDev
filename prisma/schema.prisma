@@ -78,6 +78,14 @@ model User {
   userType UserType @default(FREE)
   role     UserRole @default(USER)
   mentorApplicationsLeft Int @default(2) // Track remaining application attempts
+  
+  // Stripe subscription fields
+  stripeCustomerId String? @unique
+  stripeSubscriptionId String? @unique
+  subscriptionStatus SubscriptionStatus @default(INACTIVE)
+  subscriptionEndDate DateTime?
+  mentorExemptionActive Boolean @default(false)
+  mentorExemptionStartDate DateTime?
 }
 
 enum UserRole {
@@ -245,4 +253,12 @@ model MentorTag {
   tag             String
   mentorProfile   MentorProfile  @relation(fields: [mentorProfileId], references: [id], onDelete: Cascade)
   mentorProfileId String
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
+  PAST_DUE
+  CANCELED
+  UNPAID
 }

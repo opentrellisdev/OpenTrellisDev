@@ -21,6 +21,9 @@ export async function PATCH(
       select: {
         id: true,
         userType: true,
+        subscriptionStatus: true,
+        stripeSubscriptionId: true,
+        mentorExemptionActive: true,
         MentorApplications: {
           where: { status: 'APPROVED' },
           select: { id: true }
@@ -36,16 +39,29 @@ export async function PATCH(
       return new Response('User is not a mentor', { status: 400 })
     }
 
-    // Only revert to FREE user type - don't touch attempts
+    // Determine what user type to revert to based on subscription status
+    let newUserType: 'FREE' | 'PAID' = 'FREE'
+    
+    if (mentor.mentorExemptionActive && mentor.stripeSubscriptionId) {
+      // User had a paid subscription before becoming mentor, reactivate it
+      newUserType = 'PAID'
+    }
+
+    // Update user type and clear mentor exemption
     await db.user.update({
       where: { id: params.mentorId },
-      data: { userType: 'FREE' }
+      data: { 
+        userType: newUserType,
+        mentorExemptionActive: false,
+        mentorExemptionStartDate: null,
+        // If reactivating paid subscription, set status back to active
+        ...(newUserType === 'PAID' && { subscriptionStatus: 'ACTIVE' })
+      }
     })
 
     // Role downgrade cleanup logic
     // Unsubscribe from all private communities and delete all DMs if user is now FREE
-    const updatedUser = await db.user.findUnique({ where: { id: params.mentorId }, select: { userType: true } })
-    if (updatedUser?.userType === 'FREE') {
+    if (newUserType === 'FREE') {
       // Unsubscribe from all private communities
       const privateSubs = await db.subscription.findMany({
         where: {
@@ -73,7 +89,11 @@ export async function PATCH(
       }
     }
 
-    return new Response('Mentor status removed successfully', { status: 200 })
+    const statusMessage = newUserType === 'PAID' 
+      ? 'Mentor status removed. Paid subscription reactivated.'
+      : 'Mentor status removed successfully'
+
+    return new Response(statusMessage, { status: 200 })
   } catch (error) {
     console.error('Error removing mentor status:', error)
     return new Response('Internal server error', { status: 500 })
