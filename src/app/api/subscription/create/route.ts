@@ -55,14 +55,13 @@ export async function POST(req: Request) {
       })
     }
 
-    // Create subscription with payment method
+    // Create subscription
     const subscription = await stripe.subscriptions.create({
       customer: customerId,
       items: [{ price: process.env.STRIPE_MONTHLY_PRICE_ID }],
       payment_behavior: 'default_incomplete',
       payment_settings: { save_default_payment_method: 'on_subscription' },
       expand: ['latest_invoice.payment_intent'],
-      default_payment_method_data: paymentMethod,
     })
 
     // Update user with subscription details

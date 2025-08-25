@@ -49,20 +49,8 @@ export default function UserTypeToggle({ userType, userId }: UserTypeToggleProps
   const handlePayment = async (cardNumber: string, expiryDate: string, cvc: string, name: string) => {
     setPaymentLoading(true)
     try {
-      // Create subscription with payment details
-      const response = await axios.post('/api/subscription/create', {
-        paymentMethod: {
-          card: {
-            number: cardNumber.replace(/\s/g, ''),
-            exp_month: parseInt(expiryDate.split('/')[0]),
-            exp_year: parseInt('20' + expiryDate.split('/')[1]),
-            cvc: cvc,
-          },
-          billing_details: {
-            name: name,
-          },
-        },
-      })
+      // Create subscription
+      const response = await axios.post('/api/subscription/create')
 
       if (response.data.success) {
         setCurrentType('PAID')
