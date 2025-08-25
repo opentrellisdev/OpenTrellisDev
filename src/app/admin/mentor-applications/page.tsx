@@ -54,45 +54,31 @@ export default function MentorApplicationsPage() {
   } | null>(null)
 
   useEffect(() => {
-    console.log('useEffect triggered with session:', session)
-
     if (session === null) {
-      console.log('Session is null, redirecting to sign-in')
       router.push('/sign-in')
       return
     }
 
     if (session === undefined) {
-      console.log('Session is undefined, waiting...')
       return // Wait for session to load
     }
 
-    console.log('Session loaded:', {
-      role: session.user?.role,
-      email: session.user?.email,
-      userType: session.user?.userType
-    })
-
     // TEMPORARY: Bypass admin check for testing
     if (session?.user?.email === 'saket.sambaraju@gmail.com') {
-      console.log('Temporary bypass for testing user')
       fetchData()
       return
     }
 
     if (!session.user) {
-      console.log('No user in session, redirecting to sign-in')
       router.push('/sign-in')
       return
     }
 
     if (session.user.role !== 'ADMIN') {
-      console.log('User is not admin, redirecting to home. Role:', session.user.role)
       router.push('/')
       return
     }
 
-    console.log('User is admin, fetching data')
     fetchData()
   }, [session, router])
 
@@ -182,14 +168,7 @@ export default function MentorApplicationsPage() {
     )
   }
 
-  // Debug session info
-  console.log('Current session state:', {
-    session: session ? 'exists' : 'null',
-    user: session?.user ? 'exists' : 'null',
-    role: session?.user?.role,
-    email: session?.user?.email,
-    userType: session?.user?.userType
-  })
+
 
   return (
     <div className='w-full max-w-6xl mx-auto px-4 py-8'>
