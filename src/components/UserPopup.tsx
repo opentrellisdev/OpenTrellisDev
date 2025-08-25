@@ -65,7 +65,7 @@ const UserPopup: FC<UserPopupProps> = ({
       style={popupStyle}
       className="bg-white border border-gray-200 rounded-xl shadow-xl p-4 flex flex-col items-center min-w-[220px]"
     >
-      <UserAvatar user={{ name: username, image: userImage }} className='h-12 w-12 mb-2' />
+      <UserAvatar user={{ name: username, image: userImage || null }} className='h-12 w-12 mb-2' />
       <div className={`text-lg font-bold mb-2 ${
         userType === 'MENTOR' ? 'text-blue-600' :
         userType === 'PAID' ? 'text-yellow-500' : 
