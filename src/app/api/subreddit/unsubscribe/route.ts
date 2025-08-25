@@ -43,7 +43,6 @@ export async function POST(req: Request) {
 
     return new Response(subredditId)
   } catch (error) {
-    (error)
     if (error instanceof z.ZodError) {
       return new Response(error.message, { status: 400 })
     }
