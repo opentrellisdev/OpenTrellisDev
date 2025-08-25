@@ -25,10 +25,8 @@ export async function GET(req: Request) {
       ...(q
         ? {
             OR: [
-              { username: { contains: q, mode: 'insensitive' } },
-              { name: { contains: q, mode: 'insensitive' } },
-              { MentorProfile: { bio: { contains: q, mode: 'insensitive' } } },
-              { MentorProfile: { tags: { some: { tag: { contains: q, mode: 'insensitive' } } } } },
+              { username: { contains: q } },
+              { name: { contains: q } },
             ],
           }
         : {}),
@@ -47,14 +45,14 @@ export async function POST(req: Request) {
   if (!session?.user || session.user.userType !== 'MENTOR') {
     return new Response('Unauthorized', { status: 401 })
   }
-  const { bio, tags, name, age } = await req.json()
+  const { bio, tags, name } = await req.json()
   if (!Array.isArray(tags) || tags.some((t) => typeof t !== 'string')) {
     return new Response('Tags must be an array of strings', { status: 400 })
   }
-  // Optionally update name/age on user
+  // Optionally update name on user
   await db.user.update({
     where: { id: session.user.id },
-    data: { name, age },
+    data: { name },
   })
   // Upsert mentor profile
   const existing = await db.mentorProfile.findUnique({ where: { userId: session.user.id } })
