@@ -52,6 +52,10 @@ export async function POST(req: Request) {
       })
     }
 
+    // Get the base URL for success/cancel URLs
+    const baseUrl = process.env.NEXTAUTH_URL || 
+                   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
+
     // Create Stripe Checkout Session
     const checkoutSession = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -63,8 +67,8 @@ export async function POST(req: Request) {
         },
       ],
       mode: 'subscription',
-      success_url: `${process.env.NEXTAUTH_URL}/settings?success=true`,
-      cancel_url: `${process.env.NEXTAUTH_URL}/settings?canceled=true`,
+      success_url: `${baseUrl}/settings?success=true`,
+      cancel_url: `${baseUrl}/settings?canceled=true`,
       metadata: {
         userId: user.id,
       },
