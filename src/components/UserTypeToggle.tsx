@@ -6,7 +6,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { toast } from '@/hooks/use-toast'
 import axios from 'axios'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/Dialog'
-import { loadStripe } from '@stripe/stripe-js'
+
 import { STRIPE_PUBLISHABLE_KEY } from '@/lib/stripe'
 
 interface UserTypeToggleProps {
