@@ -54,7 +54,10 @@ const PostFeed: FC<PostFeedProps> = ({ initialPosts, subredditName }) => {
 
         const postNode = (
           <Post
-            post={post}
+            post={{
+              ...post,
+              content: typeof post.content === 'string' ? post.content : JSON.stringify(post.content || '')
+            }}
             commentAmt={post.comments.length}
             subredditName={post.subreddit.name}
             votesAmt={votesAmt}
