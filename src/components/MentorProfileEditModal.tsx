@@ -55,7 +55,7 @@ export default function MentorProfileEditModal({ open, onClose, profile, onSave,
         <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-2xl relative">
           <button className="absolute top-2 right-2 text-zinc-400 hover:text-zinc-600 text-2xl" onClick={onClose}>&times;</button>
           <div className="flex items-center gap-6 mb-6">
-            <UserAvatar user={{ name: username, image: avatar }} className="h-24 w-24" />
+            <UserAvatar user={{ name: username || null, image: avatar || null }} className="h-24 w-24" />
             <div>
               <div className="font-bold text-2xl">u/{username}</div>
               <div className="text-lg text-zinc-700">{name}</div>
