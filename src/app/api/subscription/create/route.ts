@@ -1,6 +1,6 @@
 import { getAuthSession } from '@/lib/auth'
 import { db } from '@/lib/db'
-import { stripe, createStripeCustomer, createSubscription } from '@/lib/stripe'
+import { stripe, createStripeCustomer } from '@/lib/stripe'
 import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
@@ -10,9 +10,6 @@ export async function POST(req: Request) {
     if (!session?.user) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
-
-    const body = await req.json()
-    const { paymentMethod } = body
 
     const user = await db.user.findUnique({
       where: { id: session.user.id },
@@ -55,31 +52,31 @@ export async function POST(req: Request) {
       })
     }
 
-    // Create subscription
-    const subscription = await stripe.subscriptions.create({
+    // Create Stripe Checkout Session
+    const checkoutSession = await stripe.checkout.sessions.create({
       customer: customerId,
-      items: [{ price: process.env.STRIPE_MONTHLY_PRICE_ID }],
-      payment_behavior: 'default_incomplete',
-      payment_settings: { save_default_payment_method: 'on_subscription' },
-      expand: ['latest_invoice.payment_intent'],
-    })
-
-    // Update user with subscription details
-    await db.user.update({
-      where: { id: user.id },
-      data: {
-        stripeSubscriptionId: subscription.id,
-        subscriptionStatus: 'ACTIVE',
-        userType: 'PAID',
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price: process.env.STRIPE_MONTHLY_PRICE_ID,
+          quantity: 1,
+        },
+      ],
+      mode: 'subscription',
+      success_url: `${process.env.NEXTAUTH_URL}/settings?success=true`,
+      cancel_url: `${process.env.NEXTAUTH_URL}/settings?canceled=true`,
+      metadata: {
+        userId: user.id,
       },
     })
 
     return NextResponse.json({
       success: true,
-      subscriptionId: subscription.id,
+      sessionId: checkoutSession.id,
+      url: checkoutSession.url,
     })
   } catch (error: any) {
-    console.error('Error creating subscription:', error)
+    console.error('Error creating checkout session:', error)
     return NextResponse.json({
       success: false,
       error: error.message || 'Internal Server Error'
