@@ -6,7 +6,7 @@ import { redis } from '@/lib/redis'
 import { formatTimeToNow } from '@/lib/utils'
 import { getAuthSession } from '@/lib/auth'
 import { CachedPost } from '@/types/redis'
-import { Post, User, Vote } from '@prisma/client'
+import { Post, User, Vote, Comment } from '@prisma/client'
 import { ArrowBigDown, ArrowBigUp, Loader2 } from 'lucide-react'
 import { notFound, redirect } from 'next/navigation'
 import { Suspense } from 'react'
@@ -25,7 +25,7 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
   const session = await getAuthSession()
 
   let cachedPost: CachedPost | null = null
-  let post: (Post & { votes: Vote[]; author: User }) | null = null
+  let post: (Post & { votes: Vote[]; author: User; comments: Comment[] }) | null = null
 
   try {
     cachedPost = (await redis.hgetall(
