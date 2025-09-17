@@ -124,11 +124,9 @@ const Post: FC<PostProps> = ({
             </div>
             {formatTimeToNow(new Date(post.createdAt))}
           </div>
-          <a href={`/r/${subredditName}/post/${post.id}`}>
-            <h1 className='text-lg font-semibold py-2 leading-6 text-gray-900'>
-              {post.title}
-            </h1>
-          </a>
+          <h1 className='text-lg font-semibold py-2 leading-6 text-gray-900'>
+            {post.title}
+          </h1>
 
           <div
             className='relative text-sm max-h-40 w-full overflow-clip'
