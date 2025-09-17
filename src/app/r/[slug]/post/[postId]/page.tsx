@@ -5,10 +5,11 @@ import { buttonVariants } from '@/components/ui/Button'
 import { db } from '@/lib/db'
 import { redis } from '@/lib/redis'
 import { formatTimeToNow } from '@/lib/utils'
+import { getAuthSession } from '@/lib/auth'
 import { CachedPost } from '@/types/redis'
 import { Post, User, Vote } from '@prisma/client'
 import { ArrowBigDown, ArrowBigUp, Loader2 } from 'lucide-react'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { Suspense } from 'react'
 
 interface SubRedditPostPageProps {
@@ -21,25 +22,37 @@ export const dynamic = 'force-dynamic'
 export const fetchCache = 'force-no-store'
 
 const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
-  const cachedPost = (await redis.hgetall(
-    `post:${params.postId}`
-  )) as CachedPost
-
-  let post: (Post & { votes: Vote[]; author: User }) | null = null
-
-  if (!cachedPost) {
-    post = await db.post.findFirst({
-      where: {
-        id: params.postId,
-      },
-      include: {
-        votes: true,
-        author: true,
-      },
-    })
+  // Check if user is authenticated, if not redirect to sign-in
+  const session = await getAuthSession()
+  if (!session?.user) {
+    redirect('/sign-in')
   }
 
-  if (!post && !cachedPost) return notFound()
+  let cachedPost: CachedPost | null = null
+  let post: (Post & { votes: Vote[]; author: User }) | null = null
+
+  try {
+    cachedPost = (await redis.hgetall(
+      `post:${params.postId}`
+    )) as CachedPost
+
+    if (!cachedPost) {
+      post = await db.post.findFirst({
+        where: {
+          id: params.postId,
+        },
+        include: {
+          votes: true,
+          author: true,
+        },
+      })
+    }
+
+    if (!post && !cachedPost) return notFound()
+  } catch (error) {
+    console.error('Error loading post:', error)
+    redirect('/sign-in')
+  }
 
   return (
     <div>
