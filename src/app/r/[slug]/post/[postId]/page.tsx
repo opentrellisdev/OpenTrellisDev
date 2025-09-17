@@ -94,7 +94,13 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
           
           {/* Simple Comment Section */}
           <div className="mt-8">
+            <div className="p-4 bg-red-500 text-white font-bold text-xl">
+              🔥 COMMENT SECTION SHOULD BE HERE 🔥
+            </div>
             <SimpleCommentSection postId={post?.id ?? cachedPost.id} />
+            <div className="p-4 bg-green-500 text-white font-bold text-xl">
+              🔥 COMMENT SECTION END 🔥
+            </div>
           </div>
         </div>
       </div>

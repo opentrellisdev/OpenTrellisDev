@@ -105,6 +105,9 @@ export default function SimpleCommentSection({ postId }: SimpleCommentSectionPro
 
   return (
     <div className="space-y-6">
+      <div className="p-4 bg-blue-500 text-white font-bold text-xl">
+        🚀 SIMPLE COMMENT SECTION IS RENDERING! 🚀
+      </div>
       <hr className="border-gray-200" />
       
       <div>
