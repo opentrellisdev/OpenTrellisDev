@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { Textarea } from '@/components/ui/Textarea'
 import { toast } from '@/hooks/use-toast'
@@ -25,6 +26,7 @@ interface SimpleCommentSectionProps {
 
 export default function SimpleCommentSection({ postId }: SimpleCommentSectionProps) {
   const { data: session, status } = useSession()
+  const router = useRouter()
   const [comments, setComments] = useState<Comment[]>([])
   const [newComment, setNewComment] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -81,6 +83,9 @@ export default function SimpleCommentSection({ postId }: SimpleCommentSectionPro
         // Refresh comments
         const commentsResponse = await axios.get(`/api/posts/${postId}/comments`)
         setComments(commentsResponse.data)
+        
+        // Refresh the page to update comment count
+        router.refresh()
       }
     } catch (error: any) {
       console.error('Error submitting comment:', error)

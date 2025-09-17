@@ -41,7 +41,12 @@ export async function PATCH(req: Request) {
     })
 
     console.log('Comment created successfully:', comment.id)
-    return new Response('OK')
+    return new Response(JSON.stringify({ success: true, commentId: comment.id }), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
   } catch (error) {
     console.error('Comment creation error:', error)
     if (error instanceof z.ZodError) {

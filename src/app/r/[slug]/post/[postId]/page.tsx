@@ -40,6 +40,7 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
         include: {
           votes: true,
           author: true,
+          comments: true,
         },
       })
     }
@@ -80,6 +81,11 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
           </h1>
 
           <EditorOutput content={post?.content ?? cachedPost.content} />
+          
+          {/* Comment Count */}
+          <div className="mt-6 text-sm text-gray-500">
+            {post?.comments?.length ?? 0} comments
+          </div>
           
           {/* Simple Comment Section */}
           <div className="mt-8">
