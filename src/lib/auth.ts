@@ -50,6 +50,24 @@ export const authOptions: NextAuthOptions = {
         })
       }
       if (!dbUser && user) {
+        // New user created - auto-subscribe to OpenTrellis
+        try {
+          const openTrellisSubreddit = await db.subreddit.findUnique({
+            where: { name: 'OpenTrellis' }
+          })
+          
+          if (openTrellisSubreddit) {
+            await db.subscription.create({
+              data: {
+                userId: user.id,
+                subredditId: openTrellisSubreddit.id
+              }
+            })
+          }
+        } catch (error) {
+          console.error('Error auto-subscribing new user:', error)
+        }
+        
         token.id = user.id
         token.userType = user.userType || 'FREE'
         token.role = user.role || 'USER'

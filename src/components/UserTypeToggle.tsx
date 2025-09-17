@@ -84,8 +84,8 @@ export default function UserTypeToggle({ userType, userId }: UserTypeToggleProps
       <CardFooter>
         <div className='text-xs text-zinc-500'>
           {currentType === 'PAID' 
-            ? 'You have access to all paid features. $9.99/month.' 
-            : 'Upgrade to paid to unlock premium features. $9.99/month.'
+            ? 'You have access to all paid features. $20/month.' 
+            : 'Upgrade to paid to unlock premium features. $20/month.'
           }
         </div>
       </CardFooter>
