@@ -68,7 +68,7 @@ export async function POST(req: Request) {
       ],
       mode: 'subscription',
       success_url: `${baseUrl}/settings?success=true`,
-      cancel_url: `${baseUrl}/settings?canceled=true`,
+      cancel_url: `${baseUrl}/`,
       metadata: {
         userId: user.id,
       },
