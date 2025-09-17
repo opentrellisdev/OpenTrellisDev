@@ -1,4 +1,3 @@
-import CommentsSection from '@/components/CommentsSection'
 import EditorOutput from '@/components/EditorOutput'
 import PostVoteServer from '@/components/post-vote/PostVoteServer'
 import { buttonVariants } from '@/components/ui/Button'
@@ -11,6 +10,7 @@ import { Post, User, Vote } from '@prisma/client'
 import { ArrowBigDown, ArrowBigUp, Loader2 } from 'lucide-react'
 import { notFound, redirect } from 'next/navigation'
 import { Suspense } from 'react'
+import SimpleCommentSection from '@/components/SimpleCommentSection'
 
 interface SubRedditPostPageProps {
   params: {
@@ -80,13 +80,11 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
           </h1>
 
           <EditorOutput content={post?.content ?? cachedPost.content} />
-          <Suspense
-            fallback={
-              <Loader2 className='h-5 w-5 animate-spin text-zinc-500' />
-            }>
-            {/* @ts-expect-error Server Component */}
-            <CommentsSection postId={post?.id ?? cachedPost.id} />
-          </Suspense>
+          
+          {/* Simple Comment Section */}
+          <div className="mt-8">
+            <SimpleCommentSection postId={post?.id ?? cachedPost.id} />
+          </div>
         </div>
       </div>
     </div>
