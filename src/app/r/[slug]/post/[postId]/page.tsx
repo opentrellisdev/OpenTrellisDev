@@ -22,11 +22,7 @@ export const dynamic = 'force-dynamic'
 export const fetchCache = 'force-no-store'
 
 const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
-  // Check if user is authenticated, if not redirect to sign-in
   const session = await getAuthSession()
-  if (!session?.user) {
-    redirect('/sign-in')
-  }
 
   let cachedPost: CachedPost | null = null
   let post: (Post & { votes: Vote[]; author: User }) | null = null
@@ -51,7 +47,7 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
     if (!post && !cachedPost) return notFound()
   } catch (error) {
     console.error('Error loading post:', error)
-    redirect('/sign-in')
+    return notFound()
   }
 
   return (
