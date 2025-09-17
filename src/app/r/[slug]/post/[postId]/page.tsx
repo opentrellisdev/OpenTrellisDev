@@ -87,6 +87,11 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
             {post?.comments?.length ?? 0} comments
           </div>
           
+          {/* Debug Info */}
+          <div className="mt-4 p-2 bg-yellow-100 text-xs">
+            Debug: Post ID = {post?.id ?? cachedPost.id}, Comments in post = {post?.comments?.length ?? 0}
+          </div>
+          
           {/* Simple Comment Section */}
           <div className="mt-8">
             <SimpleCommentSection postId={post?.id ?? cachedPost.id} />

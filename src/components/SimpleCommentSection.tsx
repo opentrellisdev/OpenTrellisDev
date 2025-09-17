@@ -36,11 +36,13 @@ export default function SimpleCommentSection({ postId }: SimpleCommentSectionPro
   useEffect(() => {
     const fetchComments = async () => {
       try {
+        console.log('SimpleCommentSection: Fetching comments for postId:', postId)
         setIsLoading(true)
         const response = await axios.get(`/api/posts/${postId}/comments`)
+        console.log('SimpleCommentSection: Received comments:', response.data)
         setComments(response.data)
       } catch (error) {
-        console.error('Error fetching comments:', error)
+        console.error('SimpleCommentSection: Error fetching comments:', error)
         setComments([])
       } finally {
         setIsLoading(false)
@@ -98,6 +100,8 @@ export default function SimpleCommentSection({ postId }: SimpleCommentSectionPro
       setIsSubmitting(false)
     }
   }
+
+  console.log('SimpleCommentSection: Rendering with postId:', postId, 'comments:', comments.length, 'isLoading:', isLoading)
 
   return (
     <div className="space-y-6">
