@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { Home as HomeIcon, ArrowRight } from 'lucide-react'
 import CustomFeed from '@/components/homepage/CustomFeed'
 import GeneralFeed from '@/components/homepage/GeneralFeed'
+import EnsureSubscription from '@/components/EnsureSubscription'
 
 export const dynamic = 'force-dynamic'
 export const fetchCache = 'force-no-store'
@@ -14,6 +15,7 @@ export default async function Home() {
   const session = await getAuthSession()
   return (
     <div className='w-full max-w-7xl mx-auto flex flex-col md:flex-row gap-8 px-4'>
+      <EnsureSubscription />
       <div className='flex-1 min-w-0'>
         <h1 className='font-bold text-3xl md:text-4xl mb-6'>Your feed</h1>
         {session?.user?.role === 'ADMIN' && (

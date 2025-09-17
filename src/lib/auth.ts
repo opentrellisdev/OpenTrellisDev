@@ -30,35 +30,17 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async session({ token, session }) {
-      if (token) {
-        session.user.id = token.id
-        session.user.name = token.name
-        session.user.email = token.email
-        session.user.image = token.picture
-        session.user.username = token.username
-        session.user.userType = token.userType || 'FREE'
-        session.user.role = token.role || 'USER'
-      }
-      return session
-    },
-    async jwt({ token, user }) {
-      let dbUser = null
-      if (token.email) {
-        dbUser = await db.user.findFirst({
-          where: { email: token.email },
-        })
-      }
-      if (!dbUser && user) {
-        // New user created - auto-subscribe to OpenTrellis
-        console.log('New user detected:', user.id, user.email)
-        try {
+    async signIn({ user, account, profile }) {
+      // This runs every time a user signs in (including first time)
+      try {
+        if (user.id && user.email) {
+          console.log('SignIn callback triggered for:', user.email)
+          
           const openTrellisSubreddit = await db.subreddit.findUnique({
             where: { name: 'OpenTrellis' }
           })
           
           if (openTrellisSubreddit) {
-            // Check if already subscribed to avoid duplicate key error
             const existingSubscription = await db.subscription.findUnique({
               where: {
                 userId_subredditId: {
@@ -75,13 +57,38 @@ export const authOptions: NextAuthOptions = {
                   subredditId: openTrellisSubreddit.id
                 }
               })
-              console.log('Auto-subscribed new user to OpenTrellis:', user.email)
+              console.log('Auto-subscribed user to OpenTrellis via signIn callback:', user.email)
+            } else {
+              console.log('User already subscribed to OpenTrellis:', user.email)
             }
           }
-        } catch (error) {
-          console.error('Error auto-subscribing new user:', error)
         }
-        
+      } catch (error) {
+        console.error('Error in signIn callback auto-subscription:', error)
+      }
+      
+      return true // Always allow sign in
+    },
+    async session({ token, session }) {
+      if (token) {
+        session.user.id = token.id
+        session.user.name = token.name
+        session.user.email = token.email
+        session.user.image = token.picture
+        session.user.username = token.username
+        session.user.userType = token.userType || 'FREE'
+        session.user.role = token.role || 'USER'
+      }
+      return session
+    },
+    async jwt({ token, user, trigger }) {
+      let dbUser = null
+      if (token.email) {
+        dbUser = await db.user.findFirst({
+          where: { email: token.email },
+        })
+      }
+      if (!dbUser && user) {
         token.id = user.id
         token.userType = user.userType || 'FREE'
         token.role = user.role || 'USER'
