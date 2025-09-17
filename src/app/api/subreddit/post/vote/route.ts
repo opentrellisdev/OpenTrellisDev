@@ -61,16 +61,21 @@ export async function PATCH(req: Request) {
         }, 0)
 
         if (votesAmt >= CACHE_AFTER_UPVOTES) {
-          const cachePayload: CachedPost = {
-            authorUsername: post.author.username ?? '',
-            content: JSON.stringify(post.content),
-            id: post.id,
-            title: post.title,
-            currentVote: null,
-            createdAt: post.createdAt,
-          }
+          try {
+            const cachePayload: CachedPost = {
+              authorUsername: post.author.username ?? '',
+              content: JSON.stringify(post.content),
+              id: post.id,
+              title: post.title,
+              currentVote: null,
+              createdAt: post.createdAt,
+            }
 
-          await redis.hset(`post:${postId}`, cachePayload) // Store the post data as a hash
+            await redis.hset(`post:${postId}`, cachePayload) // Store the post data as a hash
+          } catch (redisError) {
+            console.error('Redis cache error:', redisError)
+            // Continue without caching
+          }
         }
 
         return new Response('OK')
@@ -97,16 +102,21 @@ export async function PATCH(req: Request) {
       }, 0)
 
       if (votesAmt >= CACHE_AFTER_UPVOTES) {
-        const cachePayload: CachedPost = {
-          authorUsername: post.author.username ?? '',
-          content: JSON.stringify(post.content),
-          id: post.id,
-          title: post.title,
-          currentVote: voteType,
-          createdAt: post.createdAt,
-        }
+        try {
+          const cachePayload: CachedPost = {
+            authorUsername: post.author.username ?? '',
+            content: JSON.stringify(post.content),
+            id: post.id,
+            title: post.title,
+            currentVote: voteType,
+            createdAt: post.createdAt,
+          }
 
-        await redis.hset(`post:${postId}`, cachePayload) // Store the post data as a hash
+          await redis.hset(`post:${postId}`, cachePayload) // Store the post data as a hash
+        } catch (redisError) {
+          console.error('Redis cache error:', redisError)
+          // Continue without caching
+        }
       }
 
       return new Response('OK')
@@ -129,26 +139,32 @@ export async function PATCH(req: Request) {
     }, 0)
 
     if (votesAmt >= CACHE_AFTER_UPVOTES) {
-      const cachePayload: CachedPost = {
-        authorUsername: post.author.username ?? '',
-        content: JSON.stringify(post.content),
-        id: post.id,
-        title: post.title,
-        currentVote: voteType,
-        createdAt: post.createdAt,
-      }
+      try {
+        const cachePayload: CachedPost = {
+          authorUsername: post.author.username ?? '',
+          content: JSON.stringify(post.content),
+          id: post.id,
+          title: post.title,
+          currentVote: voteType,
+          createdAt: post.createdAt,
+        }
 
-      await redis.hset(`post:${postId}`, cachePayload) // Store the post data as a hash
+        await redis.hset(`post:${postId}`, cachePayload) // Store the post data as a hash
+      } catch (redisError) {
+        console.error('Redis cache error:', redisError)
+        // Continue without caching
+      }
     }
 
     return new Response('OK')
   } catch (error) {
+    console.error('Vote error:', error)
     if (error instanceof z.ZodError) {
       return new Response(error.message, { status: 400 })
     }
 
     return new Response(
-      'Could not post to subreddit at this time. Please try later',
+      'Could not vote at this time. Please try later',
       { status: 500 }
     )
   }

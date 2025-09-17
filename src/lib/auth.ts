@@ -51,18 +51,32 @@ export const authOptions: NextAuthOptions = {
       }
       if (!dbUser && user) {
         // New user created - auto-subscribe to OpenTrellis
+        console.log('New user detected:', user.id, user.email)
         try {
           const openTrellisSubreddit = await db.subreddit.findUnique({
             where: { name: 'OpenTrellis' }
           })
           
           if (openTrellisSubreddit) {
-            await db.subscription.create({
-              data: {
-                userId: user.id,
-                subredditId: openTrellisSubreddit.id
+            // Check if already subscribed to avoid duplicate key error
+            const existingSubscription = await db.subscription.findUnique({
+              where: {
+                userId_subredditId: {
+                  userId: user.id,
+                  subredditId: openTrellisSubreddit.id
+                }
               }
             })
+            
+            if (!existingSubscription) {
+              await db.subscription.create({
+                data: {
+                  userId: user.id,
+                  subredditId: openTrellisSubreddit.id
+                }
+              })
+              console.log('Auto-subscribed new user to OpenTrellis:', user.email)
+            }
           }
         } catch (error) {
           console.error('Error auto-subscribing new user:', error)
