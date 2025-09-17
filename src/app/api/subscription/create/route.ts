@@ -53,8 +53,9 @@ export async function POST(req: Request) {
     }
 
     // Get the base URL for success/cancel URLs
-    const baseUrl = process.env.NEXTAUTH_URL || 
-                   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://open-trellis-dev.vercel.app'
+      : 'http://localhost:3000'
 
     // Create Stripe Checkout Session
     const checkoutSession = await stripe.checkout.sessions.create({
