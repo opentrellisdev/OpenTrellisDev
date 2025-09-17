@@ -39,6 +39,15 @@ const CustomFeed = async () => {
     take: INFINITE_SCROLL_PAGINATION_RESULTS,
   })
 
+  // If no posts, show empty state message
+  if (!posts || posts.length === 0) {
+    return (
+      <div className="text-center py-8 text-gray-500">
+        <p>Your feed is empty. Search for communities to join and see more posts!</p>
+      </div>
+    )
+  }
+
   return <PostFeed initialPosts={posts || []} />
 }
 

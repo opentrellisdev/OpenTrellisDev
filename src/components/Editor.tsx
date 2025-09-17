@@ -88,7 +88,7 @@ export const Editor: React.FC<EditorProps> = ({ subredditId }) => {
         onReady() {
           ref.current = editor
         },
-        placeholder: 'Type here to write your post...',
+        placeholder: 'Welcome to OpenTrellis - your premier online platform that connects businesses together. Make sure to check out the mentor section for more personalized help!',
         inlineToolbar: true,
         data: { blocks: [] },
         tools: {
