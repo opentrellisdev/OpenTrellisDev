@@ -44,13 +44,13 @@ const PostFeed: FC<PostFeedProps> = ({ initialPosts, subredditName }) => {
     if (entry?.isIntersecting) fetchNextPage()
   }, [entry, fetchNextPage])
 
-  const posts = data?.pages.flatMap((page) => page) ?? initialPosts
+  const posts = data?.pages.flatMap((page) => page) ?? initialPosts ?? []
 
   return (
     <ul className="flex flex-col col-span-2 space-y-6">
-      {posts.map((post, index) => {
-        const votesAmt = post.votes.reduce((acc, v) => acc + (v.type === 'UP' ? 1 : v.type === 'DOWN' ? -1 : 0), 0)
-        const currentVote = post.votes.find(v => v.userId === session?.user.id)
+      {posts?.map((post, index) => {
+        const votesAmt = post.votes?.reduce((acc, v) => acc + (v.type === 'UP' ? 1 : v.type === 'DOWN' ? -1 : 0), 0) || 0
+        const currentVote = post.votes?.find(v => v.userId === session?.user.id)
 
         const postNode = (
           <Post
@@ -58,7 +58,7 @@ const PostFeed: FC<PostFeedProps> = ({ initialPosts, subredditName }) => {
               ...post,
               content: typeof post.content === 'string' ? post.content : JSON.stringify(post.content || '')
             }}
-            commentAmt={post.comments.length}
+            commentAmt={post.comments?.length || 0}
             subredditName={post.subreddit.name}
             votesAmt={votesAmt}
             currentVote={currentVote}

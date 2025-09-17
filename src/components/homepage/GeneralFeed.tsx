@@ -16,7 +16,7 @@ const GeneralFeed = async () => {
     take: INFINITE_SCROLL_PAGINATION_RESULTS, // 4 to demonstrate infinite scroll, should be higher in production
   })
 
-  return <PostFeed initialPosts={posts} />
+  return <PostFeed initialPosts={posts || []} />
 }
 
 export default GeneralFeed
