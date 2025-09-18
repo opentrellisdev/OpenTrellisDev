@@ -1,12 +1,6 @@
 import { db } from '@/lib/db'
 import SimpleCommentSection from '@/components/SimpleCommentSection'
 import { formatTimeToNow } from '@/lib/utils'
-import dynamicImport from 'next/dynamic'
-
-const EditorOutput = dynamicImport(() => import('@/components/EditorOutput'), {
-  ssr: false,
-  loading: () => <div className="animate-pulse bg-gray-200 h-32 rounded"></div>
-})
 
 interface SubRedditPostPageProps {
   params: {
@@ -56,7 +50,26 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
           </div>
           
           <div className="prose max-w-none">
-            <EditorOutput content={post.content} />
+            <div className="text-gray-800 leading-relaxed">
+              {post.content && typeof post.content === 'object' && post.content.blocks ? (
+                post.content.blocks.map((block: any, index: number) => (
+                  <div key={index} className="mb-4">
+                    {block.type === 'paragraph' && (
+                      <p dangerouslySetInnerHTML={{ __html: block.data.text }} />
+                    )}
+                    {block.type === 'list' && (
+                      <ul className="list-disc list-inside">
+                        {block.data.items.map((item: string, itemIndex: number) => (
+                          <li key={itemIndex} className="mb-1">{item}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <p>Content not available</p>
+              )}
+            </div>
           </div>
         </div>
         
