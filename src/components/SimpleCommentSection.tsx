@@ -36,10 +36,8 @@ export default function SimpleCommentSection({ postId }: SimpleCommentSectionPro
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        console.log('SimpleCommentSection: Fetching comments for postId:', postId)
         setIsLoading(true)
         const response = await axios.get(`/api/posts/${postId}/comments`)
-        console.log('SimpleCommentSection: Received comments:', response.data)
         setComments(response.data)
       } catch (error) {
         console.error('SimpleCommentSection: Error fetching comments:', error)
@@ -101,13 +99,9 @@ export default function SimpleCommentSection({ postId }: SimpleCommentSectionPro
     }
   }
 
-  console.log('SimpleCommentSection: Rendering with postId:', postId, 'comments:', comments.length, 'isLoading:', isLoading)
 
   return (
     <div className="space-y-6">
-      <div className="p-4 bg-blue-500 text-white font-bold text-xl">
-        🚀 SIMPLE COMMENT SECTION IS RENDERING! 🚀
-      </div>
       <hr className="border-gray-200" />
       
       <div>
