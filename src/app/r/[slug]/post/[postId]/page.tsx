@@ -1,9 +1,9 @@
 import { db } from '@/lib/db'
 import SimpleCommentSection from '@/components/SimpleCommentSection'
 import { formatTimeToNow } from '@/lib/utils'
-import dynamic from 'next/dynamic'
+import dynamicImport from 'next/dynamic'
 
-const EditorOutput = dynamic(() => import('@/components/EditorOutput'), {
+const EditorOutput = dynamicImport(() => import('@/components/EditorOutput'), {
   ssr: false,
   loading: () => <div className="animate-pulse bg-gray-200 h-32 rounded"></div>
 })
