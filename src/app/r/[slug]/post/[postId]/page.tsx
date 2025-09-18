@@ -1,15 +1,4 @@
-import EditorOutput from '@/components/EditorOutput'
-import PostVoteServer from '@/components/post-vote/PostVoteServer'
-import { buttonVariants } from '@/components/ui/Button'
 import { db } from '@/lib/db'
-import { redis } from '@/lib/redis'
-import { formatTimeToNow } from '@/lib/utils'
-import { getAuthSession } from '@/lib/auth'
-import { CachedPost } from '@/types/redis'
-import { Post, User, Vote, Comment } from '@prisma/client'
-import { ArrowBigDown, ArrowBigUp, Loader2 } from 'lucide-react'
-import { notFound, redirect } from 'next/navigation'
-import { Suspense } from 'react'
 import SimpleCommentSection from '@/components/SimpleCommentSection'
 
 interface SubRedditPostPageProps {
@@ -22,100 +11,77 @@ export const dynamic = 'force-dynamic'
 export const fetchCache = 'force-no-store'
 
 const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
-  const session = await getAuthSession()
-
-  let cachedPost: CachedPost | null = null
-  let post: (Post & { votes: Vote[]; author: User; comments: Comment[] }) | null = null
-
   try {
-    cachedPost = (await redis.hgetall(
-      `post:${params.postId}`
-    )) as CachedPost
+    // Simple database query
+    const post = await db.post.findFirst({
+      where: {
+        id: params.postId,
+      },
+      include: {
+        author: true,
+        comments: true,
+      },
+    })
 
-    if (!cachedPost) {
-      post = await db.post.findFirst({
-        where: {
-          id: params.postId,
-        },
-        include: {
-          votes: true,
-          author: true,
-          comments: true,
-        },
-      })
+    if (!post) {
+      return (
+        <div className="p-8">
+          <div className="bg-red-500 text-white p-4 text-xl font-bold">
+            ❌ Post not found!
+          </div>
+          <div className="mt-4 p-4 bg-yellow-100">
+            <p>Post ID: {params.postId}</p>
+            <p>This post does not exist in the database.</p>
+          </div>
+        </div>
+      )
     }
 
-    if (!post && !cachedPost) return notFound()
-  } catch (error) {
-    console.error('Error loading post:', error)
-    return notFound()
-  }
-
-  return (
-    <div>
-      <div className='h-full flex flex-col sm:flex-row items-center sm:items-start justify-between'>
-        <Suspense fallback={<PostVoteShell />}>
-          {/* @ts-expect-error server component */}
-          <PostVoteServer
-            postId={post?.id ?? cachedPost.id}
-            getData={async () => {
-              return await db.post.findUnique({
-                where: {
-                  id: params.postId,
-                },
-                include: {
-                  votes: true,
-                },
-              })
-            }}
-          />
-        </Suspense>
-
-        <div className='sm:w-0 w-full flex-1 bg-white p-4 rounded-sm'>
-          <p className='max-h-40 mt-1 truncate text-xs text-gray-500'>
-            Posted by u/{post?.author.username ?? cachedPost.authorUsername}{' '}
-            {formatTimeToNow(new Date(post?.createdAt ?? cachedPost.createdAt))}
+    return (
+      <div className="p-8">
+        <div className="bg-green-500 text-white p-4 text-xl font-bold">
+          ✅ Post Found!
+        </div>
+        
+        <div className="mt-6 bg-white p-6 rounded-lg shadow">
+          <h1 className="text-2xl font-bold mb-4">{post.title}</h1>
+          <p className="text-gray-600 mb-2">
+            Posted by u/{post.author.username || post.author.email}
           </p>
-          <h1 className='text-xl font-semibold py-2 leading-6 text-gray-900'>
-            {post?.title ?? cachedPost.title}
-          </h1>
-
-          <EditorOutput content={post?.content ?? cachedPost.content} />
+          <p className="text-gray-500 text-sm mb-4">
+            {post.createdAt.toLocaleDateString()}
+          </p>
           
-          {/* Comment Count */}
-          <div className="mt-6 text-sm text-gray-500">
-            {post?.comments?.length ?? 0} comments
+          <div className="mb-6">
+            <p className="text-gray-800">{JSON.stringify(post.content)}</p>
           </div>
           
-          {/* Simple Comment Section */}
-          <div className="mt-8">
-            <SimpleCommentSection postId={post?.id ?? cachedPost.id} />
+          <div className="mb-4">
+            <p className="text-lg font-semibold">
+              Comments ({post.comments.length})
+            </p>
+          </div>
+          
+          <div className="border-t pt-6">
+            <SimpleCommentSection postId={post.id} />
           </div>
         </div>
       </div>
-    </div>
-  )
-}
-
-function PostVoteShell() {
-  return (
-    <div className='flex items-center flex-col pr-6 w-20'>
-      {/* upvote */}
-      <div className={buttonVariants({ variant: 'ghost' })}>
-        <ArrowBigUp className='h-5 w-5 text-zinc-700' />
+    )
+  } catch (error) {
+    console.error('Error loading post:', error)
+    return (
+      <div className="p-8">
+        <div className="bg-red-500 text-white p-4 text-xl font-bold">
+          ❌ Error loading post!
+        </div>
+        <div className="mt-4 p-4 bg-yellow-100">
+          <p>Error: {error instanceof Error ? error.message : 'Unknown error'}</p>
+          <p>Post ID: {params.postId}</p>
+        </div>
       </div>
-
-      {/* score */}
-      <div className='text-center py-2 font-medium text-sm text-zinc-900'>
-        <Loader2 className='h-3 w-3 animate-spin' />
-      </div>
-
-      {/* downvote */}
-      <div className={buttonVariants({ variant: 'ghost' })}>
-        <ArrowBigDown className='h-5 w-5 text-zinc-700' />
-      </div>
-    </div>
-  )
+    )
+  }
 }
 
 export default SubRedditPostPage
