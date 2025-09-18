@@ -51,8 +51,8 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
           
           <div className="prose max-w-none">
             <div className="text-gray-800 leading-relaxed">
-              {post.content && typeof post.content === 'object' && post.content.blocks ? (
-                post.content.blocks.map((block: any, index: number) => (
+              {post.content && typeof post.content === 'object' && 'blocks' in post.content ? (
+                (post.content as any).blocks.map((block: any, index: number) => (
                   <div key={index} className="mb-4">
                     {block.type === 'paragraph' && (
                       <p dangerouslySetInnerHTML={{ __html: block.data.text }} />

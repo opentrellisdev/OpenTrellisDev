@@ -66,7 +66,6 @@ export default function SimpleCommentSection({ postId }: SimpleCommentSectionPro
 
     try {
       setIsSubmitting(true)
-      console.log('Submitting comment:', { postId, text: newComment })
       
       const response = await axios.patch('/api/subreddit/post/comment/', {
         postId,
@@ -184,7 +183,6 @@ export default function SimpleCommentSection({ postId }: SimpleCommentSectionPro
             </div>
           ))
         )}
-      </div>
       </div>
     </div>
   )
