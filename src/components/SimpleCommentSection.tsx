@@ -102,86 +102,90 @@ export default function SimpleCommentSection({ postId }: SimpleCommentSectionPro
 
   return (
     <div className="space-y-6">
-      <hr className="border-gray-200" />
-      
-      <div>
-        <h3 className="text-lg font-semibold mb-4">
-          Comments ({comments.length})
-        </h3>
-
-        {/* Comment Form */}
-        <div className="mb-6">
-          {status === 'loading' ? (
-            <p className="text-gray-500">Loading...</p>
-          ) : !session ? (
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <p className="text-gray-600 mb-2">Please sign in to comment</p>
-              <Button onClick={() => window.location.href = '/sign-in'}>
-                Sign In
+      {/* Comment Form */}
+      <div className="border-b border-gray-200 pb-6">
+        {status === 'loading' ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+            <span className="ml-2 text-gray-500">Loading...</span>
+          </div>
+        ) : !session ? (
+          <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+            <p className="text-blue-800 mb-3">Please sign in to comment</p>
+            <Button 
+              onClick={() => window.location.href = '/sign-in'}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              Sign In
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <Textarea
+              placeholder="What are your thoughts?"
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              rows={4}
+              className="w-full resize-none border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+            />
+            <div className="flex justify-end">
+              <Button
+                onClick={handleSubmitComment}
+                disabled={!newComment.trim() || isSubmitting}
+                className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+              >
+                {isSubmitting ? 'Posting...' : 'Post Comment'}
               </Button>
             </div>
-          ) : (
-            <div className="space-y-3">
-              <Textarea
-                placeholder="What are your thoughts?"
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                rows={4}
-                className="w-full"
-              />
-              <div className="flex justify-end">
-                <Button
-                  onClick={handleSubmitComment}
-                  disabled={!newComment.trim() || isSubmitting}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  {isSubmitting ? 'Posting...' : 'Post Comment'}
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
+      </div>
 
-        {/* Comments List */}
-        <div className="space-y-4">
-          {isLoading ? (
-            <p className="text-gray-500">Loading comments...</p>
-          ) : comments.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">
-              No comments yet. Be the first to comment!
-            </p>
-          ) : (
-            comments.map((comment) => (
-              <div key={comment.id} className="bg-gray-50 p-4 rounded-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center space-x-2">
-                    <span className={`font-medium ${
-                      comment.author.userType === 'MENTOR' ? 'text-blue-600' :
-                      comment.author.userType === 'PAID' ? 'text-yellow-600' :
-                      'text-gray-900'
-                    }`}>
-                      u/{comment.author.username || 'Anonymous'}
-                    </span>
-                    {comment.author.userType === 'MENTOR' && (
-                      <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
-                        MENTOR
-                      </span>
-                    )}
-                    {comment.author.userType === 'PAID' && (
-                      <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">
-                        PAID
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-xs text-gray-500">
-                    {formatTimeToNow(new Date(comment.createdAt))}
+      {/* Comments List */}
+      <div className="space-y-4">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+            <span className="ml-2 text-gray-500">Loading comments...</span>
+          </div>
+        ) : comments.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="text-gray-400 text-4xl mb-4">💬</div>
+            <p className="text-gray-500 text-lg">No comments yet</p>
+            <p className="text-gray-400 text-sm">Be the first to share your thoughts!</p>
+          </div>
+        ) : (
+          comments.map((comment) => (
+            <div key={comment.id} className="bg-gray-50 border border-gray-200 p-4 rounded-lg hover:bg-gray-100 transition-colors">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-2">
+                  <span className={`font-semibold ${
+                    comment.author.userType === 'MENTOR' ? 'text-blue-600' :
+                    comment.author.userType === 'PAID' ? 'text-yellow-600' :
+                    'text-gray-900'
+                  }`}>
+                    u/{comment.author.username || 'Anonymous'}
                   </span>
+                  {comment.author.userType === 'MENTOR' && (
+                    <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium">
+                      MENTOR
+                    </span>
+                  )}
+                  {comment.author.userType === 'PAID' && (
+                    <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full font-medium">
+                      PAID
+                    </span>
+                  )}
                 </div>
-                <p className="text-gray-800 whitespace-pre-wrap">{comment.text}</p>
+                <span className="text-xs text-gray-500">
+                  {formatTimeToNow(new Date(comment.createdAt))}
+                </span>
               </div>
-            ))
-          )}
-        </div>
+              <p className="text-gray-800 whitespace-pre-wrap leading-relaxed">{comment.text}</p>
+            </div>
+          ))
+        )}
+      </div>
       </div>
     </div>
   )

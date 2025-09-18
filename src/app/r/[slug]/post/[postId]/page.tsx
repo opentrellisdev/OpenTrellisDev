@@ -1,5 +1,7 @@
 import { db } from '@/lib/db'
 import SimpleCommentSection from '@/components/SimpleCommentSection'
+import EditorOutput from '@/components/EditorOutput'
+import { formatTimeToNow } from '@/lib/utils'
 
 interface SubRedditPostPageProps {
   params: {
@@ -38,31 +40,27 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
     }
 
     return (
-      <div className="p-8">
-        <div className="bg-green-500 text-white p-4 text-xl font-bold">
-          ✅ Post Found!
+      <div className="max-w-4xl mx-auto p-4">
+        {/* Post Content */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+          <div className="mb-4">
+            <p className="text-sm text-gray-500 mb-2">
+              Posted by u/{post.author.username || post.author.email} • {formatTimeToNow(new Date(post.createdAt))}
+            </p>
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">{post.title}</h1>
+          </div>
+          
+          <div className="prose max-w-none">
+            <EditorOutput content={post.content} />
+          </div>
         </div>
         
-        <div className="mt-6 bg-white p-6 rounded-lg shadow">
-          <h1 className="text-2xl font-bold mb-4">{post.title}</h1>
-          <p className="text-gray-600 mb-2">
-            Posted by u/{post.author.username || post.author.email}
-          </p>
-          <p className="text-gray-500 text-sm mb-4">
-            {post.createdAt.toLocaleDateString()}
-          </p>
-          
-          <div className="mb-6">
-            <p className="text-gray-800">{JSON.stringify(post.content)}</p>
-          </div>
-          
-          <div className="mb-4">
-            <p className="text-lg font-semibold">
+        {/* Comments Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-6">
               Comments ({post.comments.length})
-            </p>
-          </div>
-          
-          <div className="border-t pt-6">
+            </h2>
             <SimpleCommentSection postId={post.id} />
           </div>
         </div>
