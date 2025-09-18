@@ -99,7 +99,6 @@ export default function SimpleCommentSection({ postId }: SimpleCommentSectionPro
     }
   }
 
-
   return (
     <div className="space-y-6">
       {/* Comment Form */}
