@@ -63,12 +63,6 @@ export default function MentorApplicationsPage() {
       return // Wait for session to load
     }
 
-    // TEMPORARY: Bypass admin check for testing
-    if (session?.user?.email === 'saket.sambaraju@gmail.com') {
-      fetchData()
-      return
-    }
-
     if (!session.user) {
       router.push('/sign-in')
       return
