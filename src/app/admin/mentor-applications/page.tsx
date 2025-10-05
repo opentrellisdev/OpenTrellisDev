@@ -54,35 +54,43 @@ export default function MentorApplicationsPage() {
   } | null>(null)
 
   useEffect(() => {
-    console.log('Session state:', session)
-    console.log('Session user:', session?.user)
-    console.log('User role:', session?.user?.role)
-    
-    if (session === null) {
-      console.log('Session is null, redirecting to sign-in')
-      router.push('/sign-in')
-      return
+    const checkAdminAccess = async () => {
+      if (session === null) {
+        router.push('/sign-in')
+        return
+      }
+
+      if (session === undefined) {
+        return // Wait for session to load
+      }
+
+      if (!session.user) {
+        router.push('/sign-in')
+        return
+      }
+
+      // Check role from session first
+      if (session.user.role === 'ADMIN') {
+        fetchData()
+        return
+      }
+
+      // Fallback: If role is not in session (old JWT token), check via API
+      // This is a temporary workaround until users refresh their sessions
+      try {
+        const response = await axios.get('/api/admin/mentor-applications')
+        if (response.status === 200) {
+          // User has admin access, continue
+          fetchData()
+        }
+      } catch (error: any) {
+        if (error.response?.status === 401 || error.response?.status === 403) {
+          router.push('/')
+        }
+      }
     }
 
-    if (session === undefined) {
-      console.log('Session is undefined, waiting to load...')
-      return // Wait for session to load
-    }
-
-    if (!session.user) {
-      console.log('No user in session, redirecting to sign-in')
-      router.push('/sign-in')
-      return
-    }
-
-    if (session.user.role !== 'ADMIN') {
-      console.log('User role is not ADMIN:', session.user.role)
-      router.push('/')
-      return
-    }
-
-    console.log('Admin access granted, fetching data...')
-    fetchData()
+    checkAdminAccess()
   }, [session, router])
 
   const fetchData = async () => {
