@@ -1,6 +1,6 @@
 # OpenTrellis Discussion Board
 
-Welcome to **OpenTrellis Discussion Board** – the premier online community platform for entrepreneurs of all sizes in Richmond. Here, we offer a vibrant space to share knowledge, collaborate, and foster business growth. OpenTrellis is more than just a discussion board; it's a comprehensive ecosystem designed to support the entrepreneurial journey from the ground up.
+Welcome to **OpenTrellis Discussion Board** – the premier online community platform for entrepreneurs of all sizes in Richmond. Here, we offer a vibrant space to share knowledge, collaborate, and foster business growth. OpenTrellis is more than just a discussion board; it's a comprehensive ecosystem designed to support the entrepreneurial journey from the ground up
 
 ## Features
 
