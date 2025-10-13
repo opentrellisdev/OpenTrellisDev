@@ -111,13 +111,4 @@ export const authOptions: NextAuthOptions = {
   },
 }
 
-export const getAuthSession = async (req?: Request) => {
-  if (req) {
-    // For API routes, we need to pass the request headers
-    return getServerSession(authOptions, {
-      headers: req.headers,
-    })
-  }
-  // For server components
-  return getServerSession(authOptions)
-}
+export const getAuthSession = () => getServerSession(authOptions)

@@ -1,19 +1,22 @@
-import { getAuthSession } from '@/lib/auth'
+import { getToken } from 'next-auth/jwt'
 import { db } from '@/lib/db'
 import { SubredditValidator } from '@/lib/validators/subreddit'
 import { z } from 'zod'
 
 export async function POST(req: Request) {
   try {
-    const session = await getAuthSession(req)
+    const token = await getToken({ 
+      req,
+      secret: process.env.NEXTAUTH_SECRET
+    })
 
-    if (!session?.user) {
+    if (!token) {
       return new Response('Unauthorized', { status: 401 })
     }
 
     const body = await req.json()
     const { name } = SubredditValidator.parse(body)
-    const isPrivate = body.isPrivate === true && (session.user.userType === 'PAID' || session.user.userType === 'MENTOR')
+    const isPrivate = body.isPrivate === true && (token.userType === 'PAID' || token.userType === 'MENTOR')
 
     // check if subreddit already exists
     const subredditExists = await db.subreddit.findFirst({
@@ -30,7 +33,7 @@ export async function POST(req: Request) {
     const subreddit = await db.subreddit.create({
       data: {
         name,
-        Creator: { connect: { id: session.user.id } },
+        Creator: { connect: { id: token.id } },
         isPrivate,
       },
     })
@@ -38,7 +41,7 @@ export async function POST(req: Request) {
     // creator also has to be subscribed
     await db.subscription.create({
       data: {
-        userId: session.user.id,
+        userId: token.id,
         subredditId: subreddit.id,
       },
     })

@@ -1,4 +1,4 @@
-import { getAuthSession } from '@/lib/auth'
+import { getToken } from 'next-auth/jwt'
 import { db } from '@/lib/db'
 import { CommentValidator } from '@/lib/validators/comment'
 import { z } from 'zod'
@@ -10,10 +10,13 @@ export async function PATCH(req: Request) {
 
     const { postId, text, replyToId } = CommentValidator.parse(body)
 
-    const session = await getAuthSession(req)
-    console.log('Comment session:', session?.user?.email)
+    const token = await getToken({ 
+      req,
+      secret: process.env.NEXTAUTH_SECRET
+    })
+    console.log('Comment token:', token?.email)
 
-    if (!session?.user) {
+    if (!token) {
       console.log('Unauthorized comment attempt')
       return new Response('Unauthorized', { status: 401 })
     }
@@ -28,14 +31,14 @@ export async function PATCH(req: Request) {
       return new Response('Post not found', { status: 404 })
     }
 
-    console.log('Creating comment for post:', postId, 'by user:', session.user.email)
+    console.log('Creating comment for post:', postId, 'by user:', token.email)
 
     // Create the comment
     const comment = await db.comment.create({
       data: {
         text,
         postId,
-        authorId: session.user.id,
+        authorId: token.id,
         replyToId,
       },
     })

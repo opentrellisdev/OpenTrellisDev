@@ -1,4 +1,4 @@
-import { getAuthSession } from '@/lib/auth'
+import { getToken } from 'next-auth/jwt'
 import { db } from '@/lib/db'
 import { PostValidator } from '@/lib/validators/post'
 import { z } from 'zod'
@@ -9,9 +9,12 @@ export async function POST(req: Request) {
 
     const { title, content, subredditId } = PostValidator.parse(body)
 
-    const session = await getAuthSession(req)
+    const token = await getToken({ 
+      req,
+      secret: process.env.NEXTAUTH_SECRET
+    })
 
-    if (!session?.user) {
+    if (!token) {
       return new Response('Unauthorized', { status: 401 })
     }
 
@@ -19,7 +22,7 @@ export async function POST(req: Request) {
     const subscription = await db.subscription.findFirst({
       where: {
         subredditId,
-        userId: session.user.id,
+        userId: token.id,
       },
     })
 
@@ -31,7 +34,7 @@ export async function POST(req: Request) {
       data: {
         title,
         content,
-        authorId: session.user.id,
+        authorId: token.id,
         subredditId,
       },
     })
