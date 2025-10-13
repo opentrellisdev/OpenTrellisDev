@@ -9,7 +9,7 @@ export async function POST(req: Request) {
 
     const { title, content, subredditId } = PostValidator.parse(body)
 
-    const session = await getAuthSession()
+    const session = await getAuthSession(req)
 
     if (!session?.user) {
       return new Response('Unauthorized', { status: 401 })
