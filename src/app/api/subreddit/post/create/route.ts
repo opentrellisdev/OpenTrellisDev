@@ -2,6 +2,7 @@ import { getToken } from 'next-auth/jwt'
 import { db } from '@/lib/db'
 import { PostValidator } from '@/lib/validators/post'
 import { z } from 'zod'
+import { NextRequest } from 'next/server'
 
 export async function POST(req: Request) {
   try {
@@ -10,7 +11,7 @@ export async function POST(req: Request) {
     const { title, content, subredditId } = PostValidator.parse(body)
 
     const token = await getToken({ 
-      req,
+      req: req as NextRequest,
       secret: process.env.NEXTAUTH_SECRET
     })
 

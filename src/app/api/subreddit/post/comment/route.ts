@@ -2,6 +2,7 @@ import { getToken } from 'next-auth/jwt'
 import { db } from '@/lib/db'
 import { CommentValidator } from '@/lib/validators/comment'
 import { z } from 'zod'
+import { NextRequest } from 'next/server'
 
 export async function PATCH(req: Request) {
   try {
@@ -11,7 +12,7 @@ export async function PATCH(req: Request) {
     const { postId, text, replyToId } = CommentValidator.parse(body)
 
     const token = await getToken({ 
-      req,
+      req: req as NextRequest,
       secret: process.env.NEXTAUTH_SECRET
     })
     console.log('Comment token:', token?.email)
