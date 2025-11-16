@@ -1,6 +1,8 @@
 import { requireAdmin } from '@/lib/auth-middleware'
 import { db } from '@/lib/db'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(req: Request) {
   try {
     const session = await requireAdmin()
