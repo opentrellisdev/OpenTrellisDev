@@ -3,7 +3,7 @@ import MeetTheMentorSidebar from '@/components/MeetTheMentorSidebar'
 import { buttonVariants } from '@/components/ui/Button'
 import { getAuthSession } from '@/lib/auth'
 import Link from 'next/link'
-import { Home as HomeIcon, ArrowRight } from 'lucide-react'
+import { Home as HomeIcon, ArrowRight, MessageCircle } from 'lucide-react'
 import CustomFeed from '@/components/homepage/CustomFeed'
 import GeneralFeed from '@/components/homepage/GeneralFeed'
 import EnsureSubscription from '@/components/EnsureSubscription'
@@ -47,6 +47,18 @@ export default async function Home() {
                 favorite communities.
               </p>
             </div>
+            <Link
+              className={buttonVariants({
+                variant: 'outline',
+                className: 'w-full mt-4 group transition-all duration-200 border-2 border-zinc-900 hover:bg-zinc-100',
+              })}
+              href={`/r/general-forum`}>
+              <span className='flex items-center justify-center gap-2'>
+                <MessageCircle className='h-4 w-4' />
+                General Forum
+                <ArrowRight className='h-4 w-4 transition-all duration-200 group-hover:translate-x-2 group-hover:w-5' />
+              </span>
+            </Link>
             <Link
               className={buttonVariants({
                 className: 'w-full mt-4 mb-6 group transition-all duration-200',
