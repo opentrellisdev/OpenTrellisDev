@@ -77,6 +77,7 @@ model User {
   UserBThreads   DmThread[] @relation("UserBThreads")
   MentorApplications MentorApplication[]
   MentorProfile MentorProfile?
+  SolvedPosts   Post[] @relation("SolvedPosts") // Posts this user helped solve
 
   userType UserType @default(FREE)
   role     UserRole @default(USER)
@@ -123,6 +124,31 @@ model Subscription {
   @@id([userId, subredditId])
 }
 
+// ============================================
+// General Forum Enums
+// ============================================
+
+enum PostCategory {
+  BUG_TECH
+  MARKETING
+  OPERATIONS
+  LEGAL
+  FUNDING
+  HIRING
+  OTHER
+}
+
+enum BusinessStage {
+  IDEA
+  MVP
+  REVENUE
+  SCALING
+}
+
+// ============================================
+// Post Model (Extended for General Forum)
+// ============================================
+
 model Post {
   id          String    @id @default(cuid())
   title       String
@@ -136,10 +162,64 @@ model Post {
   comments    Comment[] 
   votes       Vote[]
 
+  // General Forum specific fields
+  category        PostCategory?   // Category tag (Bug/Tech, Marketing, etc.)
+  businessStage   BusinessStage?  // Stage (Idea, MVP, Revenue, Scaling)
+  isSolved        Boolean         @default(false)
+  solvedAt        DateTime?
+  solvedById      String?         // User who provided the solution
+  solvedBy        User?           @relation("SolvedPosts", fields: [solvedById], references: [id])
+  solutionSummary String?         @db.Text  // "What worked" summary
+  solvingCommentId String?        // Reference to the comment that solved it
+  
+  // Poll association
+  poll            Poll?
+
   @@index([authorId])
   @@index([subredditId])
   @@index([createdAt])
   @@index([subredditId, createdAt])
+  @@index([solvedById])
+  @@index([isSolved])
+  @@index([category])
+}
+
+// ============================================
+// Poll Models
+// ============================================
+
+model Poll {
+  id        String       @id @default(cuid())
+  question  String
+  postId    String       @unique
+  post      Post         @relation(fields: [postId], references: [id], onDelete: Cascade)
+  options   PollOption[]
+  createdAt DateTime     @default(now())
+  endsAt    DateTime?    // Optional poll end date
+  
+  @@index([postId])
+}
+
+model PollOption {
+  id        String     @id @default(cuid())
+  text      String
+  pollId    String
+  poll      Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  votes     PollVote[]
+  
+  @@index([pollId])
+}
+
+model PollVote {
+  id           String     @id @default(cuid())
+  optionId     String
+  option       PollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  voterId      String
+  createdAt    DateTime   @default(now())
+  
+  @@unique([optionId, voterId]) // One vote per user per poll
+  @@index([optionId])
+  @@index([voterId])
 }
 
 model Comment {

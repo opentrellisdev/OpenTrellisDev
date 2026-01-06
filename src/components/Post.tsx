@@ -8,7 +8,8 @@ import EditorOutput from './EditorOutput'
 import PostVoteClient from './post-vote/PostVoteClient'
 import { useSession } from 'next-auth/react'
 import DMModal from './DMModal'
-import UserPopup from './UserPopup';
+import UserPopup from './UserPopup'
+import { PostTags } from './forum/PostTags'
 
 type PartialVote = {
   type: 'UP' | 'DOWN'
@@ -27,6 +28,10 @@ interface PostProps {
       image: string | null
     }
     votes: any[]
+    // Forum-specific fields
+    category?: string | null
+    businessStage?: string | null
+    isSolved?: boolean
   }
   votesAmt: number
   subredditName: string
@@ -100,10 +105,10 @@ const Post: FC<PostProps> = ({
                   username={post.author.username}
                   userId={post.author.id}
                   userType={post.author.userType}
-                  currentUser={session?.user ? { 
-                    id: session.user.id, 
-                    userType: session.user.userType as 'FREE' | 'PAID' | 'MENTOR', 
-                    image: session.user.image 
+                  currentUser={session?.user ? {
+                    id: session.user.id,
+                    userType: session.user.userType as 'FREE' | 'PAID' | 'MENTOR',
+                    image: session.user.image
                   } : null}
                   onDM={() => {
                     setShowUserPopup(false);
@@ -124,6 +129,19 @@ const Post: FC<PostProps> = ({
             </div>
             {formatTimeToNow(new Date(post.createdAt))}
           </div>
+
+          {/* Forum Tags */}
+          {(post.category || post.businessStage || post.isSolved) && (
+            <div className='mt-2'>
+              <PostTags
+                category={post.category}
+                stage={post.businessStage}
+                isSolved={post.isSolved}
+                size='sm'
+              />
+            </div>
+          )}
+
           <Link href={`/r/${subredditName}/post/${post.id}`}>
             <h1 className='text-lg font-semibold py-2 leading-6 text-gray-900 hover:underline cursor-pointer'>
               {post.title}
