@@ -18,21 +18,21 @@ import { ImagePlus, BarChart2, X, Plus } from 'lucide-react'
 
 // Categories for the General Forum
 const CATEGORIES = [
-    { value: 'BUG_TECH', label: '🐛 Bug / Tech' },
-    { value: 'MARKETING', label: '📣 Marketing' },
-    { value: 'OPERATIONS', label: '⚙️ Operations' },
-    { value: 'LEGAL', label: '⚖️ Legal' },
-    { value: 'FUNDING', label: '💰 Funding' },
-    { value: 'HIRING', label: '👥 Hiring' },
-    { value: 'OTHER', label: '📝 Other' },
+    { value: 'BUG_TECH', label: 'Bug / Tech' },
+    { value: 'MARKETING', label: 'Marketing' },
+    { value: 'OPERATIONS', label: 'Operations' },
+    { value: 'LEGAL', label: 'Legal' },
+    { value: 'FUNDING', label: 'Funding' },
+    { value: 'HIRING', label: 'Hiring' },
+    { value: 'OTHER', label: 'Other' },
 ] as const
 
 // Business stages
 const STAGES = [
-    { value: 'IDEA', label: '💡 Idea Stage' },
-    { value: 'MVP', label: '🚀 MVP' },
-    { value: 'REVENUE', label: '💵 Revenue' },
-    { value: 'SCALING', label: '📈 Scaling' },
+    { value: 'IDEA', label: 'Idea Stage' },
+    { value: 'MVP', label: 'MVP' },
+    { value: 'REVENUE', label: 'Revenue' },
+    { value: 'SCALING', label: 'Scaling' },
 ] as const
 
 // Form validation schema

@@ -127,7 +127,7 @@ const Layout = async ({
                     className: `w-full mb-6 ${isGeneralForum ? 'bg-emerald-600 hover:bg-emerald-700' : ''}`,
                   })}
                 >
-                  {isGeneralForum ? '❓ Ask a Question' : 'Create Post'}
+                  {isGeneralForum ? 'Ask a Question' : 'Create Post'}
                 </Link>
               </dl>
             </div>

@@ -53,7 +53,7 @@ export function MarkSolved({
         },
         onSuccess: () => {
             toast({
-                title: '✅ Marked as solved!',
+                title: 'Marked as solved!',
                 description: 'Thanks for letting the community know what worked.',
             })
             setShowModal(false)
@@ -106,7 +106,7 @@ export function MarkSolved({
                 {/* What Worked */}
                 {solutionSummary && (
                     <div className='px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-lg'>
-                        <p className='text-sm font-medium text-emerald-800 mb-1'>💡 What worked:</p>
+                        <p className='text-sm font-medium text-emerald-800 mb-1'>What worked:</p>
                         <p className='text-sm text-emerald-700'>{solutionSummary}</p>
                     </div>
                 )}

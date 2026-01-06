@@ -103,7 +103,7 @@ export async function ForumLeaderboard() {
                 {leaderboard.length === 0 ? (
                     <div className='p-4 text-center text-gray-500 text-sm'>
                         <p>No solutions yet!</p>
-                        <p className='text-xs mt-1'>Be the first to help others 🚀</p>
+                        <p className='text-xs mt-1'>Be the first to help others</p>
                     </div>
                 ) : (
                     leaderboard.map((user, index) => (
@@ -153,7 +153,7 @@ export async function ForumLeaderboard() {
             {/* Footer */}
             <div className='px-4 py-3 bg-gray-50 border-t text-center'>
                 <p className='text-xs text-gray-500'>
-                    Help others solve their problems to climb the leaderboard! 🎯
+                    Help others solve their problems to climb the leaderboard!
                 </p>
             </div>
         </div>
