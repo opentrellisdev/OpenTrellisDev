@@ -27,6 +27,11 @@ const page = async ({ params }: PageProps) => {
           votes: true,
           comments: true,
           subreddit: true,
+          poll: {
+            include: {
+              options: true,
+            },
+          },
         },
         orderBy: {
           createdAt: 'desc'

@@ -56,7 +56,10 @@ const PostFeed: FC<PostFeedProps> = ({ initialPosts, subredditName }) => {
           <Post
             post={{
               ...post,
-              content: typeof post.content === 'string' ? post.content : JSON.stringify(post.content || '')
+              content: typeof post.content === 'string' ? post.content : JSON.stringify(post.content || ''),
+              category: post.category,
+              businessStage: post.businessStage,
+              isSolved: post.isSolved,
             }}
             commentAmt={post.comments?.length || 0}
             subredditName={post.subreddit.name}
